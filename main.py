@@ -14,6 +14,7 @@ class FlappyUnicorn:
     def __init__(self):
         """ Constructor """
         pygame.init()
+        self.game_active = True
         self.pillar_time_elapsed = 0
         self.cloud_time_elapsed = 0
         self.clock_tick = 0
@@ -21,8 +22,13 @@ class FlappyUnicorn:
         # Initialise settings
         self.settings = Settings()
 
+        # Load game icon
+        self.game_icon = pygame.image.load('images/icon.png')
+        pygame.display.set_icon(self.game_icon)
+
         # Set screen dimensions.
         self.SCREEN_HEIGHT, self.SCREEN_WIDTH = self.settings.screen_height, self.settings.screen_width
+        pygame.display.set_caption("Flappy Unicorn")
         self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
 
         # Create an animated flying unicorn
@@ -47,20 +53,27 @@ class FlappyUnicorn:
         while True:
             # Check key pressed events.
             self._check_key_events()
-            self._check_pillars()
-            self._check_clouds()
-            #self._check_unicorn_collision()
-            self._update_screen()
 
-            # Update clock and time elapsed.
-            self.pillar_time_elapsed += clock.get_time()
-            self.cloud_time_elapsed += clock.get_time()
+            # Normal game play when True.
+            # Paused or game over will equal false and freeze game play.
+            if self.game_active:
+                self._check_pillars()
+                self._check_clouds()
+                self._check_unicorn_collision()
+                self._update_screen()
+
+                # Update clock and time elapsed.
+                self.pillar_time_elapsed += clock.get_time()
+                self.cloud_time_elapsed += clock.get_time()
+
             clock.tick(60)
 
     def _check_unicorn_collision(self):
-        """ Respond to unicorn collision. """
-        if pygame.sprite.spritecollideany(self.unicorn_sprite, self.pillars):
-            print("COLLIDE")
+        """ Respond to a collision event. """
+        collision = pygame.sprite.groupcollide(self.unicorn_sprite, self.pillars, False, False)
+        if collision:
+            # Todo - Collided, game over
+            print("TODO:- Gameover!")
 
     def _check_clouds(self):
         """ Manage clouds on screen. """
@@ -123,6 +136,8 @@ class FlappyUnicorn:
             self.unicorn.jump_count = 0
         elif event.key == pygame.K_q:
             sys.exit(0)
+        elif event.key == pygame.K_p:
+            self.game_active = not self.game_active
 
     def _update_screen(self):
         """ Update surfaces and flip screen. """
