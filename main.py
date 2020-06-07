@@ -1,5 +1,4 @@
 import sys
-
 import pygame
 
 from background import Background
@@ -15,6 +14,8 @@ class FlappyUnicorn:
         """ Constructor """
         pygame.init()
         self.pillar_time_elapsed = 0
+        self.cloud_time_elapsed = 0
+        self.clock_tick = 0
 
         # Initialise settings
         self.settings = Settings()
@@ -30,9 +31,8 @@ class FlappyUnicorn:
         # Create the background
         self.background = Background(self)
 
-        # Todo: Create cloud sprite group.
-        # Create a cloud (test object).
-        self.cloud = Cloud(self.screen, self.settings)
+        # Create cloud.
+        self.clouds = pygame.sprite.Group()
 
         # Create pillar obstacles.
         self.pillars = pygame.sprite.Group()
@@ -47,10 +47,31 @@ class FlappyUnicorn:
             # Check key pressed events.
             self._check_key_events()
             self._check_pillars()
+            self._check_clouds()
             self._update_screen()
 
             # Update clock and time elapsed.
-            self.pillar_time_elapsed += clock.tick(60)
+            self.pillar_time_elapsed += clock.get_time()
+            self.cloud_time_elapsed += clock.get_time()
+            clock.tick(60)
+
+    def _check_clouds(self):
+        """ Manage clouds on screen. """
+
+        if self.cloud_time_elapsed > self.settings.cloud_frequency and len(self.clouds) < self.settings.cloud_qty:
+            self.cloud_time_elapsed = 0
+            new_cloud = Cloud(self)
+            self.clouds.add(new_cloud)
+
+        self._check_cloud_edges()
+
+    def _check_cloud_edges(self):
+        """ Loop through cloud sprites and check if cloud is still on screen.
+            Remove clouds that have scrolled off the display.
+        """
+        for cloud in self.clouds.copy():
+            if cloud.cloud_rect.right <= 0:
+                self.clouds.remove(cloud)
 
     def _check_pillars(self):
         """ A method that manages the pillar obstacles. """
@@ -60,10 +81,9 @@ class FlappyUnicorn:
             self.pillar_time_elapsed = 0
             self._create_pillar()
 
-        self._check_pillar_edge()
-        self.pillars.update()
+        self._check_pillar_edges()
 
-    def _check_pillar_edge(self):
+    def _check_pillar_edges(self):
         """
             Loop through the group of pillar sprites and check their right edge.
             Remove pillar sprites that have left the screen.
@@ -99,6 +119,8 @@ class FlappyUnicorn:
         """ Update surfaces and flip screen. """
         # Update background images.
         self.background.update()
+        self.clouds.update()
+        self.pillars.update()
 
         # Draw the pillar sprites that have been added to the pillar sprite group.
         for pillar in self.pillars.sprites():
@@ -109,7 +131,8 @@ class FlappyUnicorn:
         self.unicorn_sprite.draw(self.screen)
 
         # Update clouds.
-        self.cloud.update()
+        for cloud in self.clouds.sprites():
+            cloud.draw_cloud()
 
         # Flip the new display to screen.
         pygame.display.flip()
