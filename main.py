@@ -5,7 +5,8 @@ from background import Background
 from settings import Settings
 from unicorn import Unicorn
 from cloud import Cloud
-from pillar import Pillar
+from pillar_top import PillarTop
+from pillar_bottom import PillarBottom
 
 
 class FlappyUnicorn:
@@ -48,12 +49,18 @@ class FlappyUnicorn:
             self._check_key_events()
             self._check_pillars()
             self._check_clouds()
+            #self._check_unicorn_collision()
             self._update_screen()
 
             # Update clock and time elapsed.
             self.pillar_time_elapsed += clock.get_time()
             self.cloud_time_elapsed += clock.get_time()
             clock.tick(60)
+
+    def _check_unicorn_collision(self):
+        """ Respond to unicorn collision. """
+        if pygame.sprite.spritecollideany(self.unicorn_sprite, self.pillars):
+            print("COLLIDE")
 
     def _check_clouds(self):
         """ Manage clouds on screen. """
@@ -89,13 +96,15 @@ class FlappyUnicorn:
             Remove pillar sprites that have left the screen.
         """
         for pillar in self.pillars.copy():
-            if pillar.bottom_pillar_rect.right <= 0:
+            if pillar.rect.right <= 0:
                 self.pillars.remove(pillar)
 
     def _create_pillar(self):
         """ Create a new pillar object and add to the pillar sprite group. """
-        new_pillar = Pillar(self)
-        self.pillars.add(new_pillar)
+        top_pillar = PillarTop(self)
+        bottom_pillar = PillarBottom(self, top_pillar.rect)
+        pillars = [top_pillar, bottom_pillar]
+        self.pillars.add(*pillars)
 
     def _check_key_events(self):
         """ Check for key pressed events. """

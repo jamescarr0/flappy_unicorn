@@ -21,7 +21,7 @@ class Cloud(Sprite):
         self._set_cloud_position()
 
     def _set_cloud_speed(self):
-        n = randint(1, 3)
+        n = randint(1, 2)
         if n == 2:
             n -= 0.5
         return n
