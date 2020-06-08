@@ -9,6 +9,7 @@ class Scoreboard:
         self.screen = game.screen
         self.screen_rect = self.screen.get_rect()
         self.settings = game.settings
+        self.audio = game.audio
         self.score = 0
         self.scored = False
         self._create_scoreboard()
@@ -72,7 +73,7 @@ class Scoreboard:
             # If player has scored, increment score and reset flag.
             self.score += 1
             self.scored = False
-            print(f"Score: {self.score}")
+            self.audio.play_sound('point_scored')
 
     def update(self):
         """ Update the scoreboard on screen. """

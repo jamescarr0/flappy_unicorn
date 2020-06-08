@@ -1,5 +1,6 @@
 import sys
 import pygame
+import time
 
 from background import Background
 from settings import Settings
@@ -9,32 +10,36 @@ from pillar_top import PillarTop
 from pillar_bottom import PillarBottom
 from ground import Ground
 from scoreboard import Scoreboard
-
+from audio import Audio
 
 class FlappyUnicorn:
     """ A general class to manage the game. """
     def __init__(self):
         """ Constructor """
         pygame.init()
-        self.game_active = True
-        self.pillar_time_elapsed = 0
-        self.cloud_time_elapsed = 0
-        self.clock_tick = 0
-
-        # Initialise settings
-        self.settings = Settings()
+        pygame.mixer.init()
 
         # Load game icon
         self.game_icon = pygame.image.load('images/game/icon.png')
         pygame.display.set_icon(self.game_icon)
+
+        self.settings = Settings()
 
         # Set screen dimensions.
         self.SCREEN_HEIGHT, self.SCREEN_WIDTH = self.settings.screen_height, self.settings.screen_width
         pygame.display.set_caption("Flappy Unicorn")
         self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
 
+        self.game_active = True
+        self.pillar_time_elapsed = 0
+        self.cloud_time_elapsed = 0
+        self.clock_tick = 0
+
+        # Audio instance.
+        self.audio = Audio()
+
         # Create an animated flying unicorn
-        self.unicorn = Unicorn(self.screen, self.settings)
+        self.unicorn = Unicorn(self)
         self.unicorn_sprite = pygame.sprite.Group(self.unicorn)
 
         # Create the background
@@ -81,7 +86,8 @@ class FlappyUnicorn:
         """ Respond to a collision event. """
         collision = pygame.sprite.groupcollide(self.unicorn_sprite, self.pillars, False, False)
         if collision:
-            print("Gameover!")
+            self.game_active = False
+            self.unicorn.death()
 
     def _check_clouds(self):
         """ Manage clouds on screen. """
@@ -142,6 +148,7 @@ class FlappyUnicorn:
         """ Respond to a key pressed down event. """
         if event.key == pygame.K_SPACE:
             self.unicorn.jump_count = 0
+            self.audio.play_sound('wings')
 
         elif event.key == pygame.K_q:
             sys.exit(0)

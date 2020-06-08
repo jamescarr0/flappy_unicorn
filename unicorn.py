@@ -5,11 +5,12 @@ from pygame.sprite import Sprite
 class Unicorn(Sprite):
     """ A class to manage an animated unicorn sprite. """
 
-    def __init__(self, game_screen, settings):
+    def __init__(self, game):
         """ Constructor. """
         super().__init__()
-        self.screen = game_screen
-        self.settings = settings
+        self.screen = game.screen
+        self.settings = game.settings
+        self.audio = game.audio
         self.jump_count = 10
         self.animation_begin = pygame.time.get_ticks()
         self.images = []
@@ -56,6 +57,12 @@ class Unicorn(Sprite):
             # Change the image.
             self.image = self.images[self.index]
 
+    def death(self):
+        """ End of life for the flappy unicorn :-( """
+        self.audio.play_sound('hit')
+        #TODO - Death Animation Method.
+        self.audio.play_sound('die')
+
     def update(self):
         """
             Animate the unicorn by iterating through the image list.
@@ -63,3 +70,4 @@ class Unicorn(Sprite):
         """
         self._animate_unicorn()
         self._update_position()
+
