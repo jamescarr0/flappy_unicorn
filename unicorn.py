@@ -22,7 +22,7 @@ class Unicorn(Sprite):
     def _load_unicorn_images(self):
         """ Load the unicorn images and append to image list. """
         for number in range(1, 5):
-            file_name = f'images/Unicorn-Fly000{number}.png'
+            file_name = f'images/game/Unicorn-Fly000{number}.png'
             image = pygame.image.load(file_name).convert_alpha()
             self.images.append(image)
 

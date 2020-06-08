@@ -12,7 +12,7 @@ class Ground:
         self.SCREEN_WIDTH, self.SCREEN_HEIGHT = self.settings.screen_width, self.settings.screen_height
 
         # Load the ground/base image.
-        self.ground_img = pygame.image.load('images/ground.png').convert_alpha()
+        self.ground_img = pygame.image.load('images/game/ground.png').convert_alpha()
         self.ground_img = pygame.transform.smoothscale(self.ground_img, (1024, 100))
 
         # Initialise ground attributes needed to continuously scroll the ground image.

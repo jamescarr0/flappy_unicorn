@@ -25,7 +25,7 @@ class FlappyUnicorn:
         self.settings = Settings()
 
         # Load game icon
-        self.game_icon = pygame.image.load('images/icon.png')
+        self.game_icon = pygame.image.load('images/game/icon.png')
         pygame.display.set_icon(self.game_icon)
 
         # Set screen dimensions.

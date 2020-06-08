@@ -12,7 +12,7 @@ class Cloud(Sprite):
         self.settings = game.settings
 
         # Load a random cloud image.
-        self.cloud_image = pygame.image.load(f'images/clouds{randint(1, 4)}.png').convert_alpha()
+        self.cloud_image = pygame.image.load(f'images/game/clouds{randint(1, 4)}.png').convert_alpha()
         self.cloud_rect = self.cloud_image.get_rect()
 
         self.cloud_speed = float(self._set_cloud_speed())

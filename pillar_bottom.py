@@ -13,7 +13,7 @@ class PillarBottom(Sprite):
         self.top_pillar_rect = top_pillar_rect
 
         # Load bottom pillar image.
-        self.image = pygame.image.load('images/Pillar1.png').convert_alpha()
+        self.image = pygame.image.load('images/game/Pillar1.png').convert_alpha()
 
         # Resize the image.
         self._resize_pillars()
