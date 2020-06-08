@@ -50,7 +50,7 @@ class FlappyUnicorn:
         self.pillars = pygame.sprite.Group()
 
         # Create the scoreboard.
-        self.scoreboard = Scoreboard()
+        self.scoreboard = Scoreboard(self)
 
     def run(self):
         """ Main game loop. """
@@ -175,6 +175,8 @@ class FlappyUnicorn:
         # Draw new clouds to screen.
         for cloud in self.clouds.sprites():
             cloud.draw_cloud()
+
+        self.scoreboard.update()
 
         # Flip the new display to screen.
         pygame.display.flip()
