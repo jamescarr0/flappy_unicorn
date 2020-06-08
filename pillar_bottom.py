@@ -1,5 +1,6 @@
 import pygame
 from pygame.sprite import Sprite
+from random import randint
 
 
 class PillarBottom(Sprite):
@@ -19,6 +20,9 @@ class PillarBottom(Sprite):
 
         # Set image rect
         self.rect = self.image.get_rect()
+
+        # Randomly get a pillar gap for sprite to fly through to vary difficulty.
+        self.pillar_gap = randint(190, 300)
 
         # Set pillar starting position.
         self._set_pillar_position()
@@ -42,4 +46,4 @@ class PillarBottom(Sprite):
         # Set the top pillar to meet the bottom pillar, then move the bottom
         # pillar to create a gap.
         self.rect.topleft = self.top_pillar_rect.bottomleft
-        pygame.Rect.move_ip(self.rect, 0, self.settings.pillar_gap)
+        pygame.Rect.move_ip(self.rect, 0, self.pillar_gap)

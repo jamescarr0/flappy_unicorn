@@ -38,8 +38,10 @@ class PillarTop(Sprite):
 
     def _set_pillar_position(self):
         """ Randomly generate the pillar position on the screen. """
+
         # Generate a random x starting
-        x_position = randint(0, 568)
+        maximum_x_postion = 480
+        x_position = randint(0, maximum_x_postion)
 
         # Set rect position
         self.rect.bottomleft = (self.settings.screen_width, x_position)

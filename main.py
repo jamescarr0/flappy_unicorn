@@ -76,8 +76,7 @@ class FlappyUnicorn:
         """ Respond to a collision event. """
         collision = pygame.sprite.groupcollide(self.unicorn_sprite, self.pillars, False, False)
         if collision:
-            # Todo - Collided, game over
-            print("TODO:- Gameover!")
+            print("Gameover!")
 
     def _check_clouds(self):
         """ Manage clouds on screen. """
@@ -138,8 +137,10 @@ class FlappyUnicorn:
         """ Respond to a key pressed down event. """
         if event.key == pygame.K_SPACE:
             self.unicorn.jump_count = 0
+
         elif event.key == pygame.K_q:
             sys.exit(0)
+
         elif event.key == pygame.K_p:
             self.game_active = not self.game_active
 
