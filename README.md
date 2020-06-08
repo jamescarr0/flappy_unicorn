@@ -5,4 +5,4 @@ In development.
 
 Recreating the classic flappy bird side-scroller game using python and pygame.
 
-![alt text](images/screenshot-in-dev.png)
+![alt text](images/screenshot-development.png)
