@@ -9,13 +9,12 @@ class Scoreboard:
         self.screen = game.screen
         self.screen_rect = self.screen.get_rect()
         self.settings = game.settings
-        self.score = 8
+        self.score = 0
         self.scored = False
         self._create_scoreboard()
 
     def _create_scoreboard(self):
         """ Create a scoreboard image and set position. """
-        self.font = pygame.font.SysFont('Arial', 42)
         self.scoreboard_image = self._get_scoreboard_image()
         self.rect = self.scoreboard_image.get_rect()
         self.rect.top = self.screen_rect.top - 20
@@ -52,7 +51,6 @@ class Scoreboard:
             new_image.blit(img, img_rect)
             position += 1
         return new_image
-
 
     def check_score_zone(self, unicorn_group, pillar_group):
         """
