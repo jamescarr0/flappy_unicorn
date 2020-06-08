@@ -7,6 +7,7 @@ from unicorn import Unicorn
 from cloud import Cloud
 from pillar_top import PillarTop
 from pillar_bottom import PillarBottom
+from ground import Ground
 
 
 class FlappyUnicorn:
@@ -37,6 +38,9 @@ class FlappyUnicorn:
 
         # Create the background
         self.background = Background(self)
+
+        # Create ground.
+        self.ground = Ground(self)
 
         # Create cloud.
         self.clouds = pygame.sprite.Group()
@@ -141,20 +145,28 @@ class FlappyUnicorn:
 
     def _update_screen(self):
         """ Update surfaces and flip screen. """
-        # Update background images.
+
+        # Update background image.
         self.background.update()
-        self.clouds.update()
-        self.pillars.update()
 
         # Draw the pillar sprites that have been added to the pillar sprite group.
         for pillar in self.pillars.sprites():
             pillar.draw_pillars()
 
+        # Update scrolling ground position.
+        self.ground.update()
+
+        # Update clouds position
+        self.clouds.update()
+
+        # Update pillar position
+        self.pillars.update()
+
         # Update unicorn position and animation.
         self.unicorn_sprite.update()
         self.unicorn_sprite.draw(self.screen)
 
-        # Update clouds.
+        # Draw new clouds to screen.
         for cloud in self.clouds.sprites():
             cloud.draw_cloud()
 
