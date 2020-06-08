@@ -7,6 +7,8 @@ from unicorn import Unicorn
 from cloud import Cloud
 from pillar_top import PillarTop
 from pillar_bottom import PillarBottom
+from ground import Ground
+from scoreboard import Scoreboard
 
 
 class FlappyUnicorn:
@@ -38,11 +40,17 @@ class FlappyUnicorn:
         # Create the background
         self.background = Background(self)
 
+        # Create ground.
+        self.ground = Ground(self)
+
         # Create cloud.
         self.clouds = pygame.sprite.Group()
 
-        # Create pillar obstacles.
+        # Create pillar sprite group.
         self.pillars = pygame.sprite.Group()
+
+        # Create the scoreboard.
+        self.scoreboard = Scoreboard()
 
     def run(self):
         """ Main game loop. """
@@ -60,6 +68,7 @@ class FlappyUnicorn:
                 self._check_pillars()
                 self._check_clouds()
                 self._check_unicorn_collision()
+                self.scoreboard.check_score_zone(self.unicorn_sprite, self.pillars)
                 self._update_screen()
 
                 # Update clock and time elapsed.
@@ -72,8 +81,7 @@ class FlappyUnicorn:
         """ Respond to a collision event. """
         collision = pygame.sprite.groupcollide(self.unicorn_sprite, self.pillars, False, False)
         if collision:
-            # Todo - Collided, game over
-            print("TODO:- Gameover!")
+            print("Gameover!")
 
     def _check_clouds(self):
         """ Manage clouds on screen. """
@@ -89,7 +97,7 @@ class FlappyUnicorn:
         """ Loop through cloud sprites and check if cloud is still on screen.
             Remove clouds that have scrolled off the display.
         """
-        for cloud in self.clouds.copy():
+        for cloud in self.clouds:
             if cloud.cloud_rect.right <= 0:
                 self.clouds.remove(cloud)
 
@@ -134,27 +142,37 @@ class FlappyUnicorn:
         """ Respond to a key pressed down event. """
         if event.key == pygame.K_SPACE:
             self.unicorn.jump_count = 0
+
         elif event.key == pygame.K_q:
             sys.exit(0)
+
         elif event.key == pygame.K_p:
             self.game_active = not self.game_active
 
     def _update_screen(self):
         """ Update surfaces and flip screen. """
-        # Update background images.
+
+        # Update background image.
         self.background.update()
-        self.clouds.update()
-        self.pillars.update()
 
         # Draw the pillar sprites that have been added to the pillar sprite group.
         for pillar in self.pillars.sprites():
             pillar.draw_pillars()
 
+        # Update scrolling ground position.
+        self.ground.update()
+
+        # Update clouds position
+        self.clouds.update()
+
+        # Update pillar position
+        self.pillars.update()
+
         # Update unicorn position and animation.
         self.unicorn_sprite.update()
         self.unicorn_sprite.draw(self.screen)
 
-        # Update clouds.
+        # Draw new clouds to screen.
         for cloud in self.clouds.sprites():
             cloud.draw_cloud()
 
