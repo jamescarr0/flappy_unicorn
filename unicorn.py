@@ -26,14 +26,6 @@ class Unicorn(Sprite):
             image = pygame.image.load(file_name).convert_alpha()
             self.images.append(image)
 
-    def update(self):
-        """
-            Animate the unicorn by iterating through the image list.
-            Update unicorn Y position.
-        """
-        self._animate_unicorn()
-        self._update_position()
-
     def _update_position(self):
         """ Update the unicorn Y position. """
 
@@ -63,3 +55,11 @@ class Unicorn(Sprite):
 
             # Change the image.
             self.image = self.images[self.index]
+
+    def update(self):
+        """
+            Animate the unicorn by iterating through the image list.
+            Update unicorn Y position.
+        """
+        self._animate_unicorn()
+        self._update_position()

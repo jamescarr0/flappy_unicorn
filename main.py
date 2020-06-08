@@ -8,6 +8,7 @@ from cloud import Cloud
 from pillar_top import PillarTop
 from pillar_bottom import PillarBottom
 from ground import Ground
+from scoreboard import Scoreboard
 
 
 class FlappyUnicorn:
@@ -45,8 +46,11 @@ class FlappyUnicorn:
         # Create cloud.
         self.clouds = pygame.sprite.Group()
 
-        # Create pillar obstacles.
+        # Create pillar sprite group.
         self.pillars = pygame.sprite.Group()
+
+        # Create the scoreboard.
+        self.scoreboard = Scoreboard()
 
     def run(self):
         """ Main game loop. """
@@ -64,6 +68,7 @@ class FlappyUnicorn:
                 self._check_pillars()
                 self._check_clouds()
                 self._check_unicorn_collision()
+                self.scoreboard.check_score_zone(self.unicorn_sprite, self.pillars)
                 self._update_screen()
 
                 # Update clock and time elapsed.
@@ -92,7 +97,7 @@ class FlappyUnicorn:
         """ Loop through cloud sprites and check if cloud is still on screen.
             Remove clouds that have scrolled off the display.
         """
-        for cloud in self.clouds.copy():
+        for cloud in self.clouds:
             if cloud.cloud_rect.right <= 0:
                 self.clouds.remove(cloud)
 
