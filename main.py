@@ -96,7 +96,7 @@ class FlappyUnicorn:
         if obstacle_collision or screen_edge_collision:
             self.game_over = True
             self.game_active = False
-            self.unicorn.game_over()
+            self.unicorn.game_over_animate()
 
     def _check_clouds(self):
         """ Manage clouds on screen. """
@@ -149,21 +149,25 @@ class FlappyUnicorn:
             if event.type == pygame.QUIT:
                 sys.exit(0)
 
-            # Key pressed down.
+            # Key pressed down. - Deactivate when game over and not active
+
             if event.type == pygame.KEYDOWN:
                 self._check_key_down_events(event)
 
     def _check_key_down_events(self, event):
         """ Respond to a key pressed down event. """
-        if event.key == pygame.K_SPACE:
-            self.unicorn.jump_count = 0
-            self.audio.play_sound('wings')
+
+        if not self.game_over and not self.start_screen.screen_active:
+            if event.key == pygame.K_SPACE:
+                self.unicorn.jump_count = 0
+                self.audio.play_sound('wings')
 
         elif event.key == pygame.K_q:
             sys.exit(0)
 
         elif event.key == pygame.K_p:
             self.game_active = not self.game_active
+            self.start_screen.screen_active = False
 
     def _perform_checks(self):
         """ Check sprite positions. """
@@ -219,6 +223,18 @@ class FlappyUnicorn:
 
         # Flip the new display to screen.
         pygame.display.flip()
+
+    def restart(self):
+        self.pillars.empty()
+        self.clouds.empty()
+        self.unicorn.reset_rect()
+        self.scoreboard.score = 0
+        self.pillar_time_elapsed = 0
+        self.cloud_time_elapsed = 0
+        self.clock_tick = 0
+        self.game_over = False
+        self.game_active = False
+        self.start_screen.screen_active = True
 
 
 # Run the game.

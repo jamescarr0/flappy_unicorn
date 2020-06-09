@@ -11,6 +11,7 @@ class Settings:
         self.ground_animation_speed = 4
 
         # Unicorn settings.
+        self.start_position = (200, 200)
         self.jump_speed = 10
         self.drop_speed = 4
 

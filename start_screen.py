@@ -4,6 +4,7 @@ from text_image import TextImage
 class StartScreen:
     """ Start game screen. """
     def __init__(self, game):
+        self.screen_active = True
         self.screen = game.screen
         self.screen_rect = game.screen.get_rect()
 

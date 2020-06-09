@@ -1,6 +1,6 @@
 import pygame
 from pygame.sprite import Sprite
-
+import time
 
 class Unicorn(Sprite):
     """ A class to manage an animated unicorn sprite. """
@@ -9,6 +9,7 @@ class Unicorn(Sprite):
         """ Constructor. """
 
         super().__init__()
+        self.game = game
         self.game_over_flag = False
         self.screen = game.screen
         self.screen_rect = self.screen.get_rect()
@@ -21,7 +22,10 @@ class Unicorn(Sprite):
         self.index = 0
         self.image = self.images[self.index]
         self.rect = self.image.get_rect()
-        self.rect.center = (200, 350)
+        self.rect.center = self.settings.start_position
+
+    def reset_rect(self):
+        self.rect.center = self.settings.start_position
 
     def _load_unicorn_images(self):
         """ Load the unicorn images and append to image list. """
@@ -40,7 +44,11 @@ class Unicorn(Sprite):
 
         else:
             if self.rect.bottom >= self.settings.gnd_col_zone:
-                return
+                # Unicorn is on ground.  Wait.
+                # Restart game.
+                time.sleep(2)
+                self.game_over_flag = False
+                self.game.restart()
 
             self.rect.y += self.settings.drop_speed
 
@@ -62,7 +70,7 @@ class Unicorn(Sprite):
             # Change the image.
             self.image = self.images[self.index]
 
-    def game_over(self):
+    def game_over_animate(self):
         """ Game over! End of life for the flappy unicorn :-( """
         self.audio.play_sound('hit')
         self.game_over_flag = True
