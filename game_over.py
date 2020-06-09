@@ -1,8 +1,9 @@
-import pygame
 from text_image import TextImage
+
 
 class GameOver:
     """ A class to manage the game over screen. """
+
     def __init__(self, game):
         """ Constructor. """
         self.screen = game.screen
@@ -17,5 +18,6 @@ class GameOver:
         self.bg_rect.inflate_ip(20, 20)
 
     def blit_me(self):
+        """ Blit game over img to screen. """
         self.screen.fill((255, 255, 255), self.bg_rect)
         self.title.blit_me()

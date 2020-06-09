@@ -1,6 +1,5 @@
 import pygame
 from pygame.sprite import Sprite
-from text_image import TextImage
 
 
 class Unicorn(Sprite):
@@ -8,8 +7,11 @@ class Unicorn(Sprite):
 
     def __init__(self, game):
         """ Constructor. """
+
         super().__init__()
+        self.game_over_flag = False
         self.screen = game.screen
+        self.screen_rect = self.screen.get_rect()
         self.settings = game.settings
         self.audio = game.audio
         self.jump_count = 10
@@ -37,8 +39,10 @@ class Unicorn(Sprite):
             self.jump_count += 1
 
         else:
-            y = float(self.rect.y) + self.settings.drop_speed
-            self.rect.y = y
+            if self.rect.bottom >= self.settings.gnd_col_zone:
+                return
+
+            self.rect.y += self.settings.drop_speed
 
     def _animate_unicorn(self):
         """ Animate the unicorn """
@@ -61,16 +65,14 @@ class Unicorn(Sprite):
     def game_over(self):
         """ Game over! End of life for the flappy unicorn :-( """
         self.audio.play_sound('hit')
-
-
-
-        self.audio.play_sound('die')
+        self.game_over_flag = True
 
     def update(self):
         """
             Animate the unicorn by iterating through the image list.
             Update unicorn Y position.
         """
-        self._animate_unicorn()
+        if not self.game_over_flag:
+            self._animate_unicorn()
         self._update_position()
 

@@ -1,5 +1,3 @@
-from random import randint
-
 class Settings:
     """ A general class to manage the games settings. """
     def __init__(self):
@@ -26,3 +24,7 @@ class Settings:
         # Game over settings
         self.game_over_text = "Game Over!"
         self.game_over_color = (0, 0, 0)
+
+        # Collision settings
+        # height of the ground collision zone.
+        self.gnd_col_zone = 735

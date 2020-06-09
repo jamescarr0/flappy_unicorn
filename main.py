@@ -31,6 +31,7 @@ class FlappyUnicorn:
         self.SCREEN_HEIGHT, self.SCREEN_WIDTH = self.settings.screen_height, self.settings.screen_width
         pygame.display.set_caption("Flappy Unicorn")
         self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
+        self.screen_rect = self.screen.get_rect()
 
         self.game_active = False
         self.game_over = False
@@ -84,8 +85,15 @@ class FlappyUnicorn:
 
     def _check_unicorn_collision(self):
         """ Respond to a collision event. """
-        collision = pygame.sprite.groupcollide(self.unicorn_sprite, self.pillars, False, False)
-        if collision:
+
+        screen_edge_collision = False
+        for unicorn in self.unicorn_sprite:
+            if unicorn.rect.bottom >= self.settings.gnd_col_zone or unicorn.rect.top <= self.screen_rect.top:
+                screen_edge_collision = True
+                break
+
+        obstacle_collision = pygame.sprite.groupcollide(self.unicorn_sprite, self.pillars, False, False)
+        if obstacle_collision or screen_edge_collision:
             self.game_over = True
             self.game_active = False
             self.unicorn.game_over()
@@ -168,24 +176,15 @@ class FlappyUnicorn:
     def _update_screen(self):
         """ Update surfaces and flip screen. """
 
+        # Update background image.
+        self.background.update()
+
         if self.game_active:
             self._perform_checks()
-
-            # Update background image.
-            self.background.update()
 
             # Draw the pillar sprites that have been added to the pillar sprite group.
             for pillar in self.pillars.sprites():
                 pillar.draw_pillars()
-
-            # Update scrolling ground position.
-            self.ground.update()
-
-            # Update clouds position
-            self.clouds.update()
-
-            # Update pillar position
-            self.pillars.update()
 
             # Update unicorn position and animation.
             self.unicorn_sprite.update()
@@ -195,15 +194,28 @@ class FlappyUnicorn:
             for cloud in self.clouds.sprites():
                 cloud.draw_cloud()
 
+            if not self.game_over:
+                # Update scrolling ground position.
+                self.ground.update()
+
+                # Update clouds position
+                self.clouds.update()
+
+                # Update pillar position
+                self.pillars.update()
+
             self.scoreboard.update()
 
-        elif not self.game_active and self.game_over:
-            self.game_over_screen.blit_me()
-
-        elif not self.game_active and not self.game_over:
-            self.background.update()
-            self.ground.blit_background(start_screen=True)
-            self.start_screen.blit_me()
+        else:
+            if not self.game_over:
+                self.ground.blit_background(start_screen=True)
+                self.start_screen.blit_me()
+            else:
+                self.unicorn_sprite.update()
+                self.unicorn_sprite.draw(self.screen)
+                self.pillars.draw(self.screen)
+                self.ground.blit_background()
+                self.game_over_screen.blit_me()
 
         # Flip the new display to screen.
         pygame.display.flip()
