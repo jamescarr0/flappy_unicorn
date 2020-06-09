@@ -1,6 +1,7 @@
 import sys
 import pygame
 
+from start_screen import StartScreen
 from background import Background
 from settings import Settings
 from unicorn import Unicorn
@@ -9,32 +10,39 @@ from pillar_top import PillarTop
 from pillar_bottom import PillarBottom
 from ground import Ground
 from scoreboard import Scoreboard
-
+from audio import Audio
 
 class FlappyUnicorn:
     """ A general class to manage the game. """
     def __init__(self):
         """ Constructor """
         pygame.init()
-        self.game_active = True
-        self.pillar_time_elapsed = 0
-        self.cloud_time_elapsed = 0
-        self.clock_tick = 0
-
-        # Initialise settings
-        self.settings = Settings()
+        pygame.mixer.init()
 
         # Load game icon
-        self.game_icon = pygame.image.load('images/icon.png')
+        self.game_icon = pygame.image.load('images/game/icon.png')
         pygame.display.set_icon(self.game_icon)
+
+        self.settings = Settings()
 
         # Set screen dimensions.
         self.SCREEN_HEIGHT, self.SCREEN_WIDTH = self.settings.screen_height, self.settings.screen_width
         pygame.display.set_caption("Flappy Unicorn")
         self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
 
+        self.game_active = False
+        self.pillar_time_elapsed = 0
+        self.cloud_time_elapsed = 0
+        self.clock_tick = 0
+
+        # Audio instance.
+        self.audio = Audio()
+
+        # Create start screen
+        self.start_screen = StartScreen(self)
+
         # Create an animated flying unicorn
-        self.unicorn = Unicorn(self.screen, self.settings)
+        self.unicorn = Unicorn(self)
         self.unicorn_sprite = pygame.sprite.Group(self.unicorn)
 
         # Create the background
@@ -50,7 +58,7 @@ class FlappyUnicorn:
         self.pillars = pygame.sprite.Group()
 
         # Create the scoreboard.
-        self.scoreboard = Scoreboard()
+        self.scoreboard = Scoreboard(self)
 
     def run(self):
         """ Main game loop. """
@@ -61,19 +69,11 @@ class FlappyUnicorn:
         while True:
             # Check key pressed events.
             self._check_key_events()
+            self._update_screen()
 
-            # Normal game play when True.
-            # Paused or game over will equal false and freeze game play.
-            if self.game_active:
-                self._check_pillars()
-                self._check_clouds()
-                self._check_unicorn_collision()
-                self.scoreboard.check_score_zone(self.unicorn_sprite, self.pillars)
-                self._update_screen()
-
-                # Update clock and time elapsed.
-                self.pillar_time_elapsed += clock.get_time()
-                self.cloud_time_elapsed += clock.get_time()
+            # Update clock and time elapsed.
+            self.pillar_time_elapsed += clock.get_time()
+            self.cloud_time_elapsed += clock.get_time()
 
             clock.tick(60)
 
@@ -81,7 +81,8 @@ class FlappyUnicorn:
         """ Respond to a collision event. """
         collision = pygame.sprite.groupcollide(self.unicorn_sprite, self.pillars, False, False)
         if collision:
-            print("Gameover!")
+            self.game_active = False
+            self.unicorn.die()
 
     def _check_clouds(self):
         """ Manage clouds on screen. """
@@ -142,6 +143,7 @@ class FlappyUnicorn:
         """ Respond to a key pressed down event. """
         if event.key == pygame.K_SPACE:
             self.unicorn.jump_count = 0
+            self.audio.play_sound('wings')
 
         elif event.key == pygame.K_q:
             sys.exit(0)
@@ -149,32 +151,50 @@ class FlappyUnicorn:
         elif event.key == pygame.K_p:
             self.game_active = not self.game_active
 
+    def _perform_checks(self):
+        """ Check sprite positions. """
+
+        self._check_pillars()
+        self._check_clouds()
+        self._check_unicorn_collision()
+        self.scoreboard.check_score_zone(self.unicorn_sprite, self.pillars)
+
     def _update_screen(self):
         """ Update surfaces and flip screen. """
 
-        # Update background image.
-        self.background.update()
+        if self.game_active:
+            self._perform_checks()
 
-        # Draw the pillar sprites that have been added to the pillar sprite group.
-        for pillar in self.pillars.sprites():
-            pillar.draw_pillars()
+            # Update background image.
+            self.background.update()
 
-        # Update scrolling ground position.
-        self.ground.update()
+            # Draw the pillar sprites that have been added to the pillar sprite group.
+            for pillar in self.pillars.sprites():
+                pillar.draw_pillars()
 
-        # Update clouds position
-        self.clouds.update()
+            # Update scrolling ground position.
+            self.ground.update()
 
-        # Update pillar position
-        self.pillars.update()
+            # Update clouds position
+            self.clouds.update()
 
-        # Update unicorn position and animation.
-        self.unicorn_sprite.update()
-        self.unicorn_sprite.draw(self.screen)
+            # Update pillar position
+            self.pillars.update()
 
-        # Draw new clouds to screen.
-        for cloud in self.clouds.sprites():
-            cloud.draw_cloud()
+            # Update unicorn position and animation.
+            self.unicorn_sprite.update()
+            self.unicorn_sprite.draw(self.screen)
+
+            # Draw new clouds to screen.
+            for cloud in self.clouds.sprites():
+                cloud.draw_cloud()
+
+            self.scoreboard.update()
+
+        else:
+            self.background.update()
+            self.ground.blit_background(start_screen=True)
+            self.start_screen.blit_me()
 
         # Flip the new display to screen.
         pygame.display.flip()
