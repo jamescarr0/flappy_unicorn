@@ -42,15 +42,7 @@ class Unicorn(Sprite):
             self.rect.y = y
             self.jump_count += 1
 
-        else:
-            if self.rect.bottom >= self.settings.gnd_col_zone:
-                # Unicorn is on ground.  Wait.
-                # Restart game.
-                time.sleep(2)
-                self.game_over_flag = False
-                self.game.restart()
-
-            self.rect.y += self.settings.drop_speed
+        self.rect.y += self.settings.drop_speed
 
     def _animate_unicorn(self):
         """ Animate the unicorn """
@@ -69,11 +61,6 @@ class Unicorn(Sprite):
 
             # Change the image.
             self.image = self.images[self.index]
-
-    def game_over_animate(self):
-        """ Game over! End of life for the flappy unicorn :-( """
-        self.audio.play_sound('hit')
-        self.game_over_flag = True
 
     def update(self):
         """
