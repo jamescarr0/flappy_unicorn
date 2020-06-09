@@ -22,3 +22,7 @@ class Settings:
         # Cloud settings.
         self.cloud_frequency = 4500
         self.cloud_qty = 3
+
+        # Game over settings
+        self.game_over_text = "Game Over!"
+        self.game_over_color = (0, 0, 0)

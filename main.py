@@ -11,6 +11,8 @@ from pillar_bottom import PillarBottom
 from ground import Ground
 from scoreboard import Scoreboard
 from audio import Audio
+from game_over import GameOver
+
 
 class FlappyUnicorn:
     """ A general class to manage the game. """
@@ -31,6 +33,8 @@ class FlappyUnicorn:
         self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
 
         self.game_active = False
+        self.game_over = False
+
         self.pillar_time_elapsed = 0
         self.cloud_time_elapsed = 0
         self.clock_tick = 0
@@ -38,8 +42,9 @@ class FlappyUnicorn:
         # Audio instance.
         self.audio = Audio()
 
-        # Create start screen
+        # Create start and game over screens.
         self.start_screen = StartScreen(self)
+        self.game_over_screen = GameOver(self)
 
         # Create an animated flying unicorn
         self.unicorn = Unicorn(self)
@@ -81,8 +86,9 @@ class FlappyUnicorn:
         """ Respond to a collision event. """
         collision = pygame.sprite.groupcollide(self.unicorn_sprite, self.pillars, False, False)
         if collision:
+            self.game_over = True
             self.game_active = False
-            self.unicorn.die()
+            self.unicorn.game_over()
 
     def _check_clouds(self):
         """ Manage clouds on screen. """
@@ -191,7 +197,10 @@ class FlappyUnicorn:
 
             self.scoreboard.update()
 
-        else:
+        elif not self.game_active and self.game_over:
+            self.game_over_screen.blit_me()
+
+        elif not self.game_active and not self.game_over:
             self.background.update()
             self.ground.blit_background(start_screen=True)
             self.start_screen.blit_me()

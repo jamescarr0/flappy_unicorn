@@ -1,5 +1,6 @@
 import pygame
 from pygame.sprite import Sprite
+from text_image import TextImage
 
 
 class Unicorn(Sprite):
@@ -57,10 +58,12 @@ class Unicorn(Sprite):
             # Change the image.
             self.image = self.images[self.index]
 
-    def die(self):
-        """ End of life for the flappy unicorn :-( """
+    def game_over(self):
+        """ Game over! End of life for the flappy unicorn :-( """
         self.audio.play_sound('hit')
-        #TODO - Death Animation Method.
+
+
+
         self.audio.play_sound('die')
 
     def update(self):

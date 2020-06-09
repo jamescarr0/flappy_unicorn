@@ -13,7 +13,7 @@ class StartScreen:
         self.rect.bottomleft = self.screen_rect.bottomleft
         self.rect.move_ip(30, -30)
 
-        self.title = TextImage(game.screen, "FlAppy UnIcQrn", size=100, text_color=(237, 93, 183))
+        self.title = TextImage(game.screen, "FlAppy UnIcQrn", size=100)
         self.title.change_position(0, -200)
 
         self.start_button = TextImage(game.screen, text="sTaRt", size=50, text_color=(255, 255, 255))
