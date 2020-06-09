@@ -9,6 +9,7 @@ class Ground:
         # Initialise game attributes.
         self.settings = game.settings
         self.screen = game.screen
+        self.screen_rect = self.screen.get_rect()
         self.SCREEN_WIDTH, self.SCREEN_HEIGHT = self.settings.screen_width, self.settings.screen_height
 
         # Load the ground/base image.
@@ -19,9 +20,21 @@ class Ground:
         self.ground_img_x = 0
         self.ground_img_x2 = self.ground_img.get_width()
 
+    def blit_background(self, start_screen=False):
+        """ Blit ground images. """
+
+        if start_screen:
+            img = pygame.image.load('images/game/start_ground.png').convert_alpha()
+            img_rect = img.get_rect()
+            img_rect.midbottom = self.screen_rect.midbottom
+            self.screen.blit(img, img_rect)
+        else:
+            self.screen.blit(self.ground_img, (self.ground_img_x, 700))
+            self.screen.blit(self.ground_img, (self.ground_img_x2, 700))
+
     def update(self):
         """ Update the ground image. """
-        self._blit_background()
+        self.blit_background()
 
         # Set ground animation speed.
         self.ground_img_x -= self.settings.ground_animation_speed
@@ -32,9 +45,3 @@ class Ground:
             self.ground_img_x = self.SCREEN_WIDTH
         if self.ground_img_x2 <= -self.SCREEN_WIDTH:
             self.ground_img_x2 = self.SCREEN_WIDTH
-
-    def _blit_background(self):
-        """ Blit ground images. """
-
-        self.screen.blit(self.ground_img, (self.ground_img_x, 700))
-        self.screen.blit(self.ground_img, (self.ground_img_x2, 700))
