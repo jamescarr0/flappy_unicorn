@@ -1,14 +1,17 @@
 import pygame
 from pygame.sprite import Sprite
-
+import time
 
 class Unicorn(Sprite):
     """ A class to manage an animated unicorn sprite. """
 
     def __init__(self, game):
         """ Constructor. """
+
         super().__init__()
+        self.game = game
         self.screen = game.screen
+        self.screen_rect = self.screen.get_rect()
         self.settings = game.settings
         self.audio = game.audio
         self.jump_count = 10
@@ -18,7 +21,10 @@ class Unicorn(Sprite):
         self.index = 0
         self.image = self.images[self.index]
         self.rect = self.image.get_rect()
-        self.rect.center = (200, 350)
+        self.rect.center = self.settings.start_position
+
+    def reset_rect(self):
+        self.rect.center = self.settings.start_position
 
     def _load_unicorn_images(self):
         """ Load the unicorn images and append to image list. """
@@ -35,9 +41,7 @@ class Unicorn(Sprite):
             self.rect.y = y
             self.jump_count += 1
 
-        else:
-            y = float(self.rect.y) + self.settings.drop_speed
-            self.rect.y = y
+        self.rect.y += self.settings.drop_speed
 
     def _animate_unicorn(self):
         """ Animate the unicorn """
@@ -57,17 +61,12 @@ class Unicorn(Sprite):
             # Change the image.
             self.image = self.images[self.index]
 
-    def die(self):
-        """ End of life for the flappy unicorn :-( """
-        self.audio.play_sound('hit')
-        #TODO - Death Animation Method.
-        self.audio.play_sound('die')
-
-    def update(self):
+    def update(self, animation=True):
         """
             Animate the unicorn by iterating through the image list.
             Update unicorn Y position.
         """
-        self._animate_unicorn()
+        if animation:
+            self._animate_unicorn()
         self._update_position()
 
