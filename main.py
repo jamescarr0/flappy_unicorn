@@ -1,6 +1,5 @@
 import sys
 import pygame
-import time
 
 
 from start_screen import StartScreen
@@ -40,7 +39,7 @@ class FlappyUnicorn:
 
         self.pillar_time_elapsed = 0
         self.cloud_time_elapsed = 0
-        self.clock_tick = pygame.time.get_ticks()
+        self.clock_tick = 0
 
         # Audio instance.
         self.audio = Audio()
@@ -85,6 +84,50 @@ class FlappyUnicorn:
 
             clock.tick(60)
 
+    def _check_key_events(self):
+        """ Check for key pressed events. """
+        for event in pygame.event.get():
+            # Quit / Exit game.
+            if event.type == pygame.QUIT:
+                sys.exit(0)
+
+            # Key pressed event.
+            if event.type == pygame.KEYDOWN:
+                self._check_key_down_events(event)
+
+            # Mouse clicked event.
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_position = pygame.mouse.get_pos()
+                self._check_button_clicked(mouse_position)
+
+    def _check_key_down_events(self, event):
+        """ Respond to a key pressed down event. """
+
+        if not self.game_over and not self.start_screen.screen_active:
+            if event.key == pygame.K_SPACE:
+                self.unicorn.jump_count = 0
+                self.audio.play_sound('wings')
+
+        elif event.key == pygame.K_q:
+            sys.exit(0)
+
+        elif event.key == pygame.K_p:
+            self.game_active = True
+            self.start_screen.screen_active = False
+
+    def _check_button_clicked(self, mouse_position):
+        """ Check if player clicked a button and process request. """
+
+        # Start game button
+        if self.start_screen.start_button.rect.collidepoint(mouse_position):
+            self.game_active = True
+            self.start_screen.screen_active = False
+            pygame.mouse.set_visible(False)
+
+        # Retry Button
+        if self.game_over_screen.retry_button.rect.collidepoint(mouse_position):
+            self.restart()
+
     def _check_unicorn_collision(self):
         """ Respond to a collision event. """
 
@@ -117,6 +160,13 @@ class FlappyUnicorn:
             if cloud.cloud_rect.right <= 0:
                 self.clouds.remove(cloud)
 
+    def _create_pillar(self):
+        """ Create a new pillar object and add to the pillar sprite group. """
+        top_pillar = PillarTop(self)
+        bottom_pillar = PillarBottom(self, top_pillar.rect)
+        pillars = [top_pillar, bottom_pillar]
+        self.pillars.add(*pillars)
+
     def _check_pillars(self):
         """ A method that manages the pillar obstacles. """
 
@@ -135,51 +185,6 @@ class FlappyUnicorn:
         for pillar in self.pillars.copy():
             if pillar.rect.right <= 0:
                 self.pillars.remove(pillar)
-
-    def _create_pillar(self):
-        """ Create a new pillar object and add to the pillar sprite group. """
-        top_pillar = PillarTop(self)
-        bottom_pillar = PillarBottom(self, top_pillar.rect)
-        pillars = [top_pillar, bottom_pillar]
-        self.pillars.add(*pillars)
-
-    def _check_key_events(self):
-        """ Check for key pressed events. """
-        for event in pygame.event.get():
-            # Quit / Exit game.
-            if event.type == pygame.QUIT:
-                sys.exit(0)
-
-            # Key pressed event.
-            if event.type == pygame.KEYDOWN:
-                self._check_key_down_events(event)
-
-            # Mouse clicked event.
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_position = pygame.mouse.get_pos()
-                self._check_play_clicked(mouse_position)
-
-    def _check_play_clicked(self, mouse_position):
-        """ Start game if player clicks start button. """
-        if self.start_screen.start_button.rect.collidepoint(mouse_position):
-            self.game_active = True
-            self.start_screen.screen_active = False
-            pygame.mouse.set_visible(False)
-
-    def _check_key_down_events(self, event):
-        """ Respond to a key pressed down event. """
-
-        if not self.game_over and not self.start_screen.screen_active:
-            if event.key == pygame.K_SPACE:
-                self.unicorn.jump_count = 0
-                self.audio.play_sound('wings')
-
-        elif event.key == pygame.K_q:
-            sys.exit(0)
-
-        elif event.key == pygame.K_p:
-            self.game_active = True
-            self.start_screen.screen_active = False
 
     def _perform_checks(self):
         """ Check sprite positions. """
@@ -219,32 +224,36 @@ class FlappyUnicorn:
                 # Update pillar position
                 self.pillars.update()
 
+        elif not self.game_over:
+            # Start Screen.
+            self.ground.blit_background(start_screen=True)
+            self.start_screen.blit_me()
         else:
-            if not self.game_over:
-                # Start Screen.
-                self.ground.blit_background(start_screen=True)
-                self.start_screen.blit_me()
-            else:
-                self._game_over_loop()
+            self._game_over_loop()
 
         # Flip the new display to screen.
         pygame.display.flip()
 
     def _game_over_loop(self):
-        """ Halt game and blit game over to screen. """
-
-        # TODO Clock delay for game over.
-        current_time = pygame.time.get_ticks()
-        elapsed = current_time - self.clock_tick
-
+        """
+            Halt game blit game over and retry button to screen.
+            Enable mouse cursor.
+        """
         self.game_over = True
         self.game_active = False
-        self.unicorn_sprite.update()
+
+        if self.unicorn.rect.bottom >= self.screen_rect.bottom:
+            self.unicorn.rect.bottom = self.screen_rect.bottom
+
+        self.unicorn_sprite.update(animation=False)
         self.unicorn_sprite.draw(self.screen)
         self.pillars.draw(self.screen)
         self.ground.blit_background()
         self.scoreboard.update()
         self.game_over_screen.blit_me()
+
+        # Enable mouse cursor.
+        pygame.mouse.set_visible(True)
 
     def restart(self):
         """ Reset game attributes and start a new game. """
@@ -255,9 +264,8 @@ class FlappyUnicorn:
         self.pillar_time_elapsed = 0
         self.cloud_time_elapsed = 0
         self.game_over = False
-        self.game_active = False
-        self.start_screen.screen_active = True
-        pygame.mouse.set_visible(True)
+        self.game_active = True
+        pygame.mouse.set_visible(False)
 
 
 # Run the game.

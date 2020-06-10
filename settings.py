@@ -12,8 +12,8 @@ class Settings:
 
         # Unicorn settings.
         self.start_position = (200, 200)
-        self.jump_speed = 10
-        self.drop_speed = 4
+        self.jump_speed = 12
+        self.drop_speed = 8
 
         # Pillar obstacle settings.
         self.pillar_frequency = 3000
@@ -25,6 +25,7 @@ class Settings:
         # Game over settings
         self.game_over_text = "Game Over!"
         self.game_over_color = (0, 0, 0)
+        self.retry_button_text = "rEtRy"
 
         # Collision settings
         # height of the ground collision zone.

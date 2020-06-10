@@ -22,7 +22,7 @@ class PillarBottom(Sprite):
         self.rect = self.image.get_rect()
 
         # Randomly get a pillar gap for sprite to fly through to vary difficulty.
-        self.pillar_gap = randint(190, 300)
+        self.pillar_gap = randint(150, 250)
 
         # Set pillar starting position.
         self._set_pillar_position()

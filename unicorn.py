@@ -10,7 +10,6 @@ class Unicorn(Sprite):
 
         super().__init__()
         self.game = game
-        self.game_over_flag = False
         self.screen = game.screen
         self.screen_rect = self.screen.get_rect()
         self.settings = game.settings
@@ -62,12 +61,12 @@ class Unicorn(Sprite):
             # Change the image.
             self.image = self.images[self.index]
 
-    def update(self):
+    def update(self, animation=True):
         """
             Animate the unicorn by iterating through the image list.
             Update unicorn Y position.
         """
-        if not self.game_over_flag:
+        if animation:
             self._animate_unicorn()
         self._update_position()
 

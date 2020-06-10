@@ -21,12 +21,14 @@ class Cloud(Sprite):
         self._set_cloud_position()
 
     def _set_cloud_speed(self):
+        """ Randomly set a speed for a cloud. """
         n = randint(1, 2)
         if n == 2:
             n -= 0.5
         return n
 
     def _set_cloud_position(self):
+        """ Randomly assign the clouds position in the sky. """
         t_pos = randint(0, 100)
         self.cloud_rect.topleft = (self.settings.screen_width, t_pos)
         self.x = float(self.cloud_rect.x)
